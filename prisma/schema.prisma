@@ -29,14 +29,14 @@ model User {
 model MaterialUsage {
   id String @id @default(cuid())
   dataset String @default("BIN")
-  usageDate DateTime @db.Date
-  recordNo String
+  usageDate DateTime? @db.Date
+  recordNo String?
   productCode String
   recipeCode String
   lineCode String
   sumMassKg Decimal? @db.Decimal(38, 15)
-  eachKg Decimal @db.Decimal(38, 15)
-  eachTons Decimal @db.Decimal(38, 18)
+  eachKg Decimal? @db.Decimal(38, 15)
+  eachTons Decimal? @db.Decimal(38, 18)
   sourceEachTons Decimal? @db.Decimal(38, 18)
   remark String
   kibbleCode String

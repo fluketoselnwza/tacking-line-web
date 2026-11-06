@@ -2,18 +2,18 @@ import Decimal from 'decimal.js';
 import { Prisma } from '@prisma/client';
 import { db } from './db';
 import { type Filters, whereFilters, previousPeriod, iso, bucketDate, utc } from './filters';
-export type AggregateRow={usageDate:Date;eachKg:Prisma.Decimal|string;eachTons:Prisma.Decimal|string;sumMassKg:Prisma.Decimal|string|null;lineCode:string;recipeCode:string;remark:string;kibbleCode:string};
+export type AggregateRow={usageDate:Date|null;eachKg:Prisma.Decimal|string|null;eachTons:Prisma.Decimal|string|null;sumMassKg:Prisma.Decimal|string|null;lineCode:string;recipeCode:string;remark:string;kibbleCode:string};
 const sum=(rows:AggregateRow[],key:'eachKg'|'eachTons'|'sumMassKg')=>rows.reduce((a,r)=>r[key]===null?a:a.plus(String(r[key])),new Decimal(0)).toFixed();
-export function metrics(rows:AggregateRow[]){return {totalTons:sum(rows,'eachTons'),totalKg:sum(rows,'eachKg'),totalSumMassKg:sum(rows,'sumMassKg'),sumMassRecords:rows.filter(r=>r.sumMassKg!==null).length,totalRecords:rows.length,activeLines:new Set(rows.map(r=>r.lineCode)).size,activeRecipes:new Set(rows.map(r=>r.recipeCode)).size};}
+export function metrics(rows:AggregateRow[]){return {totalTons:sum(rows,'eachTons'),totalKg:sum(rows,'eachKg'),totalSumMassKg:sum(rows,'sumMassKg'),sumMassRecords:rows.filter(r=>r.sumMassKg!==null).length,totalRecords:rows.length,activeLines:new Set(rows.map(r=>r.lineCode).filter(Boolean)).size,activeRecipes:new Set(rows.map(r=>r.recipeCode).filter(Boolean)).size};}
 export function change(current:string|number,previous:string|number):string|null {return new Decimal(previous).eq(0)?null:new Decimal(current).minus(previous).div(previous).times(100).toFixed(2);}
 export function groups(rows:AggregateRow[],key:'lineCode'|'recipeCode'|'remark'|'kibbleCode'){
-  const map=new Map<string,AggregateRow[]>();for(const row of rows){const name=row[key];map.set(name,[...(map.get(name)??[]),row]);}
+  const map=new Map<string,AggregateRow[]>();for(const row of rows){const name=row[key] || "ไม่ระบุ";map.set(name,[...(map.get(name)??[]),row]);}
   const total=new Decimal(sum(rows,'eachTons'));
   return [...map].map(([name,items])=>({name,tons:sum(items,'eachTons'),kg:sum(items,'eachKg'),records:items.length,percentage:total.eq(0)?'0':new Decimal(sum(items,'eachTons')).div(total).times(100).toFixed(2)})).sort((a,b)=>new Decimal(b.tons).cmp(a.tons));
 }
 export function series(rows:AggregateRow[],grain:string){
   const map=new Map<string,Record<string,string>>();
-  for(const row of rows){const date=bucketDate(row.usageDate,grain);const item=map.get(date)??{date,total:'0'};item[row.lineCode]=new Decimal(item[row.lineCode]??0).plus(String(row.eachTons)).toFixed();item.total=new Decimal(item.total).plus(String(row.eachTons)).toFixed();map.set(date,item);}
+  for(const row of rows){if (!row.usageDate || row.eachTons === null) continue; const date=bucketDate(row.usageDate,grain);const item=map.get(date)??{date,total:'0'};item[row.lineCode || "ไม่ระบุ"]=new Decimal(item[row.lineCode || "ไม่ระบุ"]??0).plus(String(row.eachTons)).toFixed();item.total=new Decimal(item.total).plus(String(row.eachTons)).toFixed();map.set(date,item);}
   return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
 }
 export async function dashboard(f:Filters){
@@ -41,5 +41,5 @@ export async function options(dataset:string){
   const fields=['productCode','recipeCode','lineCode','remark','kibbleCode'] as const;
   const result=await Promise.all(fields.map(field=>db.materialUsage.findMany({...base,distinct:[field],select:{[field]:true},orderBy:{[field]:'asc'}})));
   const dates=await db.materialUsage.aggregate({...base,_min:{usageDate:true},_max:{usageDate:true}});
-  return {...Object.fromEntries(fields.map((field,i)=>[field,result[i].map(r=>(r as unknown as Record<string,string>)[field])])),dateFrom:dates._min.usageDate?iso(dates._min.usageDate):null,dateTo:dates._max.usageDate?iso(dates._max.usageDate):null};
+  return {...Object.fromEntries(fields.map((field,i)=>[field,result[i].map(r=>(r as unknown as Record<string,string>)[field]).filter(Boolean)])),dateFrom:dates._min.usageDate?iso(dates._min.usageDate):null,dateTo:dates._max.usageDate?iso(dates._max.usageDate):null};
 }

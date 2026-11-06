@@ -111,7 +111,7 @@ async function handler(req:NextRequest){
     const count=await db.materialUsage.count({where:whereFilters(f)});
     if(count>50000)throw new AppError(413,'Export ได้ครั้งละ 50,000 รายการ กรุณาลดช่วงวันที่');
     const data=await db.materialUsage.findMany({where:whereFilters(f),orderBy:[{[f.sort]:f.order},{id:'asc'}],take:50000});
-    const rows=data.map(r=>Object.fromEntries(HEADERS.map((h,i)=>[h,[iso(r.usageDate),r.recordNo,r.productCode,r.recipeCode,r.lineCode,r.sumMassKg?.toFixed()??null,r.eachKg.toFixed(),r.eachTons.toFixed(),r.remark,r.kibbleCode][i]])));
+    const rows=data.map(r=>Object.fromEntries(HEADERS.map((h,i)=>[h,[r.usageDate ? iso(r.usageDate) : null,r.recordNo,r.productCode,r.recipeCode,r.lineCode,r.sumMassKg?.toFixed()??null,r.eachKg?.toFixed()??null,r.eachTons?.toFixed()??null,r.remark,r.kibbleCode][i]])));
     return download(rows,format,'material-usage');
   }
   throw new AppError(404,'ไม่พบ API');

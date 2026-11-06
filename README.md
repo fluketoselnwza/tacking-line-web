@@ -47,7 +47,7 @@ npm start
 - `/upload`: drag/drop, server validation, immutable preview, conflict review, confirmation (Admin)
 - `/records`: search/filter/sort, server-side pagination, details, audited edits/deletes (Admin)
 - `/recipes`: recipe totals, Top 10, by LINE, daily trends; click recipe to drill down
-- `/lines`: comparison, daily/monthly usage, Top Recipes and FG/WIP per LINE
+- `/lines`: comparison, daily/monthly usage, Top Recipes and FG/WIP/REMIX per LINE
 - `/upload/history`: counts, uploader, errors, batch details, audit, rollback (Admin)
 
 ## Excel Import
@@ -67,7 +67,7 @@ npm start
 
 ### น้ำหนักและความละเอียด
 
-- EACH(KG) เป็นค่าหลัก ต้องไม่ว่าง/ไม่ติดลบ; canonical EACH(Tons) = KG / 1000 ใช้ Decimal.js และ PostgreSQL NUMERIC ไม่บวกน้ำหนักด้วย JavaScript Number
+- ทุกคอลัมน์เว้นว่างหรือใส่ `-` ได้ โดยวันที่/No./น้ำหนักที่ไม่ระบุเก็บเป็น null และข้อความเก็บเป็นค่าว่าง น้ำหนักที่ระบุต้องไม่ติดลบ; เมื่อมี KG: canonical EACH(Tons) = KG / 1000; หากไม่มี KG ใช้ Tons ที่ระบุ ใช้ Decimal.js และ PostgreSQL NUMERIC ไม่บวกน้ำหนักด้วย JavaScript Number
 - ถ้า EACH(Tons) ว่างคำนวณจาก KG; ถ้ามีค่า ยอมรับค่าที่ปัดเศษแบบ half-up ตามจำนวนทศนิยมของค่าตัวเลขในไฟล์ เช่น KG 6188 กับ Tons 6.19; ศูนย์ท้ายทศนิยมและรูปแบบการแสดงผลของเซลล์ไม่นับเป็นความละเอียดเพิ่มเติม โดยยังบันทึกค่าจริง 6.188 จาก KG และเก็บต้นฉบับ 6.19 ใน sourceEachTons
 - SUM MASS เป็น nullable และแยกจาก EACH ไม่เติมจาก KG, KPI รวมเฉพาะค่าที่มี
 - เก็บ KG ที่ NUMERIC(38,15), Tons NUMERIC(38,18), จำกัด input น้ำหนักไม่เกิน 15 decimal places / ต่ำกว่า 1e20; ค่าที่เกินจะถูก reject แทนการปัดเงียบ
@@ -77,7 +77,7 @@ npm start
 
 ### Duplicate / Replace / Rollback
 
-Business key คือ **dataset + usageDate + recordNo** ไม่ใช่ Products/Recipe หาก No. ซ้ำในวันที่เดียวกันข้าม Sheet จะระบุ ambiguous และห้าม Import ต้องยืนยันว่าข้อมูลอยู่คนละ Dataset หรือแก้ไฟล์ต้นฉบับก่อน ระบบไม่เพิ่ม sourceSheet เข้า key เพื่อหลบความซ้ำ
+Business key คือ **dataset + usageDate + recordNo** ไม่ใช่ Products/Recipe ตรวจ business key เฉพาะแถวที่มีวันที่และ No. ครบ แถวไม่มีวันที่จะเพิ่มรายการโดยไม่แทนที่วันที่เดิม กราฟตามเวลาไม่รวมรายการไม่มีวันที่ หาก No. ซ้ำในวันที่เดียวกันข้าม Sheet จะระบุ ambiguous และห้าม Import ต้องยืนยันว่าข้อมูลอยู่คนละ Dataset หรือแก้ไฟล์ต้นฉบับก่อน ระบบไม่เพิ่ม sourceSheet เข้า key เพื่อหลบความซ้ำ
 
 - SHA-256 ระบุไฟล์เดิมภายใน Dataset; Skip ไฟล์ที่ Hash เคย Import แล้วจะข้ามทั้งหมด
 - **Skip**: ข้ามทุกแถวในวันที่มีข้อมูลอยู่ใน Dataset แล้ว นำเข้าเฉพาะวันที่ยังไม่มีข้อมูล (เหมาะกับไฟล์ daily/monthly snapshots)

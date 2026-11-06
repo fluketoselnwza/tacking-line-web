@@ -4,7 +4,7 @@ import { calendarDate } from './excel';
 const date=z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{try{return calendarDate(v)===v;}catch{return false;}},'Invalid calendar date');
 export const filterSchema=z.object({
   from:date.optional(),to:date.optional(),month:z.coerce.number().int().min(1).max(12).optional(),year:z.coerce.number().int().min(1900).max(2200).optional(),
-  dataset:z.string().min(1).max(80).default('BIN'),productCode:z.string().max(120).optional(),recipeCode:z.string().max(120).optional(),lineCode:z.string().max(120).optional(),remark:z.enum(['FG','WIP']).optional(),kibbleCode:z.string().max(120).optional(),search:z.string().max(120).optional(),
+  dataset:z.string().min(1).max(80).default('BIN'),productCode:z.string().max(120).optional(),recipeCode:z.string().max(120).optional(),lineCode:z.string().max(120).optional(),remark:z.enum(['FG','WIP','REMIX']).optional(),kibbleCode:z.string().max(120).optional(),search:z.string().max(120).optional(),
   page:z.coerce.number().int().min(1).default(1),pageSize:z.coerce.number().int().min(1).max(100).default(20),sort:z.enum(['usageDate','recordNo','productCode','recipeCode','lineCode','eachKg','eachTons','sumMassKg','remark','kibbleCode']).default('usageDate'),order:z.enum(['asc','desc']).default('desc'),grain:z.enum(['daily','weekly','monthly']).default('daily'),
 }).superRefine((v,ctx)=>{if(v.from && v.to && v.from>v.to)ctx.addIssue({code:'custom',message:'วันเริ่มต้องไม่เกินวันสิ้นสุด',path:['to']});if(v.month && !v.year)ctx.addIssue({code:'custom',message:'ต้องระบุปีเมื่อเลือกเดือน',path:['year']});});
 export type Filters=z.infer<typeof filterSchema>;

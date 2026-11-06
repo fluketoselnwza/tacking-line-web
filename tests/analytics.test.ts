@@ -3,6 +3,13 @@ import { metrics,groups,series,change,type AggregateRow } from '../src/lib/analy
 import { parseFilters,whereFilters,previousPeriod,utc } from '../src/lib/filters';
 const rows:AggregateRow[]=[{usageDate:utc('2026-07-01'),eachKg:'0.1',eachTons:'0.0001',sumMassKg:null,lineCode:'A',recipeCode:'R1',remark:'FG',kibbleCode:'EX1'},{usageDate:utc('2026-07-01'),eachKg:'0.2',eachTons:'0.0002',sumMassKg:'99.9',lineCode:'B',recipeCode:'R1',remark:'WIP',kibbleCode:'EX2'}];
 describe('dashboard aggregation',()=>{
+ it('handles unknown dates and weights without fabricating dated usage',()=>{
+   const missing:AggregateRow={usageDate:null,eachKg:null,eachTons:null,sumMassKg:null,lineCode:'',recipeCode:'',remark:'',kibbleCode:''};
+   expect(metrics([missing])).toMatchObject({totalRecords:1,totalKg:'0',activeLines:0,activeRecipes:0});
+   expect(series([missing],'daily')).toEqual([]);
+   expect(groups([missing],'remark')[0].name).toBe('ไม่ระบุ');
+ });
+
  it('separates SUM MASS and EACH using exact decimal sums',()=>{expect(metrics(rows)).toEqual({totalKg:'0.3',totalTons:'0.0003',totalSumMassKg:'99.9',sumMassRecords:1,totalRecords:2,activeLines:2,activeRecipes:1});});
  it('grand total equals grouped records',()=>{expect(groups(rows,'lineCode').map(r=>r.tons)).toEqual(['0.0002','0.0001']);expect(series(rows,'daily')[0].total).toBe('0.0003');});
  it('groups by Monday week / calendar month',()=>{expect(series(rows,'weekly')[0].date).toBe('2026-06-29');expect(series(rows,'monthly')[0].date).toBe('2026-07-01');});

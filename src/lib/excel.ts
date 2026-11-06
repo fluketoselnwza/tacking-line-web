@@ -5,8 +5,8 @@ Decimal.set({ precision: 50 });
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 export const MAX_ROWS = 50000;
 export type UsageRow = {
-  usageDate: string; recordNo: string; productCode: string; recipeCode: string; lineCode: string;
-  sumMassKg: string | null; eachKg: string; eachTons: string; sourceEachTons: string | null;
+  usageDate: string | null; recordNo: string | null; productCode: string; recipeCode: string; lineCode: string;
+  sumMassKg: string | null; eachKg: string | null; eachTons: string | null; sourceEachTons: string | null;
   remark: string; kibbleCode: string; sourceSheet: string; sourceRow: number;
 };
 export type RowError = { sheetName: string; rowNumber: number; fieldName: string; errorMessage: string };
@@ -35,8 +35,10 @@ export function calendarDate(value: unknown, date1904 = false): string {
   if (y < 1900 || y > 2200 || check.getUTCFullYear() !== y || check.getUTCMonth() + 1 !== m || check.getUTCDate() !== d) throw new Error('วันที่ไม่ถูกต้อง');
   return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 }
+export const missing = (value: unknown) => value == null || String(value).trim() === '' || String(value).trim() === '-';
+export const optionalText = (value: unknown) => missing(value) ? '' : String(value).trim();
 export function weight(value: unknown, optional = false): string | null {
-  if (value === '' || value === null || value === undefined) {
+  if (missing(value)) {
     if (optional) return null;
     throw new Error('ต้องระบุน้ำหนัก');
   }
@@ -64,8 +66,8 @@ export function parseWorkbook(buffer: Buffer) {
       continue;
     }
     sheets.push(sheetName);
-    const missing = HEADERS.filter((h, i) => normalize(data[headerIndex][i]) !== normalize(h));
-    if (missing.length) { errors.push({sheetName,rowNumber:headerIndex+1,fieldName:'headers',errorMessage:`หัวตารางไม่ตรง: ${missing.join(', ')}`}); continue; }
+    const missingHeaders = HEADERS.filter((h, i) => normalize(data[headerIndex][i]) !== normalize(h));
+    if (missingHeaders.length) { errors.push({sheetName,rowNumber:headerIndex+1,fieldName:'headers',errorMessage:`หัวตารางไม่ตรง: ${missingHeaders.join(', ')}`}); continue; }
     let carriedDate: unknown = null;
     for (let i = headerIndex + 1; i < data.length; i++) {
       const cells = data[i];
@@ -79,31 +81,37 @@ export function parseWorkbook(buffer: Buffer) {
       if (totalRows > MAX_ROWS) throw new AppError(413, 'จำนวนแถวเกิน 50,000');
       const issues: RowError[] = [];
       const read = <T>(fieldName: string, fn:()=>T, fallback:T):T => { try { return fn(); } catch(e) { issues.push({sheetName,rowNumber:i+1,fieldName,errorMessage:(e as Error).message}); return fallback; } };
-      const required = (idx:number) => { const v = String(cells[idx] ?? '').trim(); if (!v || v.length > 120) throw new Error('จำเป็นต้องระบุค่าไม่เกิน 120 ตัวอักษร'); return v; };
-      const usageDate = read('Date',()=>calendarDate(rawDate, !!workbook.Workbook?.WBProps?.date1904),'');
-      const recordNo = read('No.',()=>required(1),'');
-      const productCode = read('Products',()=>required(2),'');
-      const recipeCode = read('RECIPE',()=>required(3),'');
-      const lineCode = read('LINE',()=>required(4),'');
-      const sumMassKg = read('SUM MASS(KG)',()=>weight(cells[5],true),null);
-      const eachKg = read('EACH(KG)',()=>weight(cells[6])!,'0');
-      const sourceEachTons = read('EACH(Tons)',()=>weight(cells[7],true),null);
-      const eachTons = new Decimal(eachKg).div(1000).toFixed();
-      if (sourceEachTons !== null) {
+      const textCell = (idx:number) => { const v = optionalText(cells[idx]); if (v.length > 120) throw new Error('ต้องไม่เกิน 120 ตัวอักษร'); return v; };
+      const usageDate = read('Date',()=>missing(rawDate) ? null : calendarDate(rawDate, !!workbook.Workbook?.WBProps?.date1904),null);
+      const recordNo = read('No.',()=>textCell(1) || null,null);
+      const productCode = read('Products',()=>textCell(2),'');
+      const recipeCode = read('RECIPE',()=>textCell(3),'');
+      const lineCode = read('LINE',()=>textCell(4),'');
+      // Excel numeric cells have 15 significant digits. Remove binary calculation
+      // artifacts before decimal validation; text cells retain strict precision checks.
+      const excelWeight = (value: unknown, optional = false) => weight(
+        typeof value === 'number' && Number.isFinite(value) ? value.toPrecision(15) : value,
+        optional,
+      );
+      const sumMassKg = read('SUM MASS(KG)',()=>excelWeight(cells[5],true),null);
+      const eachKg = read('EACH(KG)',()=>excelWeight(cells[6],true),null);
+      const sourceEachTons = read('EACH(Tons)',()=>excelWeight(cells[7],true),null);
+      const eachTons = eachKg === null ? sourceEachTons : new Decimal(eachKg).div(1000).toFixed();
+      if (sourceEachTons !== null && eachKg !== null && eachTons !== null) {
         const sourceTons = new Decimal(sourceEachTons);
         // Accept source values rounded half-up; always store the exact KG-derived value.
         const roundedTons = new Decimal(eachTons).toDecimalPlaces(sourceTons.decimalPlaces(), Decimal.ROUND_HALF_UP);
         if (!sourceTons.eq(roundedTons)) issues.push({sheetName,rowNumber:i+1,fieldName:'EACH(Tons)',errorMessage:`ไม่ตรงกับ EACH(KG)/1000 (${eachTons}) แม้ปัดเศษตามทศนิยมของค่าในไฟล์ กรุณาแก้ไขไฟล์`});
       }
-      const remark = read('REMARK',()=>{ const v=required(8).toUpperCase(); if (!['FG','WIP'].includes(v)) throw new Error('ต้องเป็น FG หรือ WIP'); return v; },'');
-      const kibbleCode = read('Usage of kibble',()=>required(9),'');
+      const remark = read('REMARK',()=>{ const v=textCell(8).toUpperCase(); if (v && !['FG','WIP','REMIX'].includes(v)) throw new Error('ต้องเป็น FG, WIP หรือ REMIX'); return v; },'');
+      const kibbleCode = read('Usage of kibble',()=>textCell(9),'');
       errors.push(...issues);
       if (!issues.length) rows.push({usageDate,recordNo,productCode,recipeCode,lineCode,sumMassKg,eachKg,eachTons,sourceEachTons,remark,kibbleCode,sourceSheet:sheetName,sourceRow:i+1});
     }
   }
   const seen = new Map<string, UsageRow>();
   const duplicateKeys = new Set<string>();
-  for (const r of rows) { const key=`${r.usageDate}|${r.recordNo}`; if (seen.has(key)) { const first=seen.get(key)!; if (!duplicateKeys.has(key)) errors.push({sheetName:first.sourceSheet,rowNumber:first.sourceRow,fieldName:'No.',errorMessage:'วันที่ + No. ซ้ำในไฟล์ ต้องตรวจสอบขอบเขตชุดข้อมูล'}); duplicateKeys.add(key); errors.push({sheetName:r.sourceSheet,rowNumber:r.sourceRow,fieldName:'No.',errorMessage:`วันที่ + No. ซ้ำกับ ${first.sourceSheet} แถว ${first.sourceRow}; ต้องตรวจสอบขอบเขตชุดข้อมูล`}); } else seen.set(key,r); }
+  for (const r of rows) { if (!r.usageDate || !r.recordNo) continue; const key=`${r.usageDate}|${r.recordNo}`; if (seen.has(key)) { const first=seen.get(key)!; if (!duplicateKeys.has(key)) errors.push({sheetName:first.sourceSheet,rowNumber:first.sourceRow,fieldName:'No.',errorMessage:'วันที่ + No. ซ้ำในไฟล์ ต้องตรวจสอบขอบเขตชุดข้อมูล'}); duplicateKeys.add(key); errors.push({sheetName:r.sourceSheet,rowNumber:r.sourceRow,fieldName:'No.',errorMessage:`วันที่ + No. ซ้ำกับ ${first.sourceSheet} แถว ${first.sourceRow}; ต้องตรวจสอบขอบเขตชุดข้อมูล`}); } else seen.set(key,r); }
   if (!sheets.length && !errors.length) throw new AppError(422,'ไม่พบ Sheet ข้อมูลการใช้งาน');
   const validRows = rows.filter(r=>!duplicateKeys.has(`${r.usageDate}|${r.recordNo}`));
   const badRows = new Set(errors.map(e=>`${e.sheetName}:${e.rowNumber}`));
