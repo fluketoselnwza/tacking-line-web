@@ -148,3 +148,19 @@ npx tsx scripts/pivot-check.ts 'file.xlsx' 2026-07-01 2026-07-31 123.456 LINE1 R
 - UI host ฟอนต์ Sarabun Regular/SemiBold ใน public/fonts พร้อมใบอนุญาต SIL OFL ไม่ต้องโหลดฟอนต์จากภายนอกตอนเปิดหน้า
 
 # tacking-line-web
+
+### Environment configuration
+
+Server code, seed scripts, and HTTP checks read environment settings through
+`src/lib/config.ts`. Settings present in the local `.env` have fallback values
+in config; environment values override these defaults (an empty string remains
+an explicit value). These defaults include credentials, so keep the config private.
+For example `import { config } from '@/lib/config'` and
+`config.sessionSecret`. Do not import this module into client components because
+it exposes server settings and credentials. Next.js loads `.env` for the app;
+standalone scripts need Node's `--env-file=.env` flag as in `npm run db:seed`.
+Prisma CLI keeps `env("DATABASE_URL")` in `prisma/schema.prisma` because the schema
+cannot import TypeScript config. Runtime Prisma clients use `config.databaseUrl`.
+Integration tests use `TEST_DATABASE_URL` only when `NODE_ENV=test` and
+`RUN_DB_TESTS=1`. HTTP checks accept `SMOKE_BASE_URL` (default
+`http://127.0.0.1:3000`).

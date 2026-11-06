@@ -1,3 +1,4 @@
+import { config } from './config';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { db } from './db';
@@ -7,7 +8,7 @@ export function assertRole(actor:Pick<Actor,'role'>, admin=false) {
   if (admin && actor.role !== 'ADMIN') throw new AppError(403,'เฉพาะผู้ดูแลระบบเท่านั้น');
 }
 function secret() {
-  const value=process.env.SESSION_SECRET;
+  const value=config.sessionSecret;
   if (!value || value.length < 32) throw new AppError(503,'กรุณาตั้งค่า SESSION_SECRET อย่างน้อย 32 ตัวอักษร');
   return new TextEncoder().encode(value);
 }
@@ -31,6 +32,6 @@ export async function requireUser(admin=false) {
 export function checkOrigin(request:Request) {
   const origin=request.headers.get('origin');
   const url=new URL(request.url);
-  const expected=process.env.APP_ORIGIN ?? `${url.protocol}//${request.headers.get('host') ?? url.host}`;
+  const expected=config.appOrigin ?? `${url.protocol}//${request.headers.get('host') ?? url.host}`;
   if (!origin || origin !== expected) throw new AppError(403,'คำขอข้ามเว็บไซต์ไม่ได้รับอนุญาต');
 }

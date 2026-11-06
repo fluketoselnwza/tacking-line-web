@@ -1,3 +1,4 @@
+import { config } from '@/lib/config';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { compare } from 'bcryptjs';
@@ -39,7 +40,7 @@ async function handler(req:NextRequest){
     if(!user||!valid)throw new AppError(401,'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
     attempts.delete(key);
     const token=await signSession(user);
-    (await cookies()).set('recipe_session',token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:28800});
+    (await cookies()).set('recipe_session',token,{httpOnly:true,secure:config.isProduction,sameSite:'lax',path:'/',maxAge:28800});
     return NextResponse.json({user:{id:user.id,name:user.name,role:user.role,email:user.email}});
   }
   const admin=method!=='GET';

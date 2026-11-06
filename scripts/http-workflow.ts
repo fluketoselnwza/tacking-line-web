@@ -1,14 +1,15 @@
+import { config } from '../src/lib/config';
 import assert from 'node:assert/strict';
 import * as XLSX from 'xlsx';
 import { PrismaClient } from '@prisma/client';
 import { HEADERS } from '../src/lib/excel';
-const base=process.env.SMOKE_BASE_URL??'http://127.0.0.1:3000';
+const base=config.smokeBaseUrl;
 const dataset=`HTTP_TEST_${Date.now()}`;
-const db=new PrismaClient();
+const db=new PrismaClient({datasourceUrl: config.databaseUrl});
 let userId:string;
 const batches:string[]=[],recordIds:string[]=[];
 async function main(){
- const login=await fetch(`${base}/api/auth/login`,{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify({email:process.env.ADMIN_EMAIL,password:process.env.ADMIN_PASSWORD})});
+ const login=await fetch(`${base}/api/auth/login`,{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify({email:config.adminEmail,password:config.adminPassword})});
  assert.equal(login.status,200);userId=(await login.json()).user.id;
  const cookie=login.headers.get('set-cookie')!.split(';')[0];
  const jsonHeaders={Origin:base,Cookie:cookie,'Content-Type':'application/json'};

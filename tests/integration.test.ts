@@ -1,8 +1,8 @@
+import { config } from '../src/lib/config';
 import { describe,it,expect,beforeAll,afterAll } from 'vitest';
 import * as XLSX from 'xlsx';
 // Integration tests require a dedicated migrated database. No truncate/delete-all.
-const enabled=process.env.RUN_DB_TESTS==='1' && !!process.env.TEST_DATABASE_URL;
-if(enabled)process.env.DATABASE_URL=process.env.TEST_DATABASE_URL;
+const enabled=config.runDbTests;
 import { db } from '../src/lib/db';
 import { previewImport,confirmImport,rollbackBatch,writeTransaction } from '../src/lib/imports';
 import { modifyRecord } from '../src/lib/records';
