@@ -1,0 +1,2 @@
+'use client';
+export default function Error({reset}:{error:Error;reset:()=>void}){return <div className="rounded-xl border border-red-100 bg-white p-8"><h2 className="font-semibold">ไม่สามารถแสดงข้อมูลได้</h2><p className="mt-2 text-sm text-slate-500">กรุณาตรวจสอบการเชื่อมต่อ แล้วลองใหม่</p><button className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-white" onClick={reset}>ลองใหม่</button></div>;}

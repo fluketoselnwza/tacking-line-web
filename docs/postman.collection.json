@@ -1,0 +1,312 @@
+{
+  "info": {
+    "name": "MaterialIQ API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "id",
+      "value": ""
+    },
+    {
+      "key": "batchId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "POST auth/login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "{{baseUrl}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "description": "POST auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "POST auth/logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "{{baseUrl}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout",
+        "description": "POST auth/logout"
+      }
+    },
+    {
+      "name": "GET auth/me",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/auth/me",
+        "description": "GET auth/me"
+      }
+    },
+    {
+      "name": "POST import/preview",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "{{baseUrl}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/import/preview",
+        "description": "POST import/preview",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": ""
+            },
+            {
+              "key": "dataset",
+              "type": "text",
+              "value": "BIN"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST import/confirm",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "{{baseUrl}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/import/confirm",
+        "description": "POST import/confirm",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"batchId\": \"{{batchId}}\", \"mode\": \"skip\"}"
+        }
+      }
+    },
+    {
+      "name": "GET import/history",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/import/history",
+        "description": "GET import/history"
+      }
+    },
+    {
+      "name": "GET import/history/{id}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/import/history/{{id}}",
+        "description": "GET import/history/{id}"
+      }
+    },
+    {
+      "name": "GET import/history/{id}/errors",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/import/history/{{id}}/errors",
+        "description": "GET import/history/{id}/errors"
+      }
+    },
+    {
+      "name": "POST import/history/{id}/rollback",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "{{baseUrl}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/import/history/{{id}}/rollback",
+        "description": "POST import/history/{id}/rollback"
+      }
+    },
+    {
+      "name": "GET dashboard/summary",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/dashboard/summary",
+        "description": "GET dashboard/summary"
+      }
+    },
+    {
+      "name": "GET dashboard/daily-usage",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/dashboard/daily-usage",
+        "description": "GET dashboard/daily-usage"
+      }
+    },
+    {
+      "name": "GET dashboard/line-distribution",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/dashboard/line-distribution",
+        "description": "GET dashboard/line-distribution"
+      }
+    },
+    {
+      "name": "GET dashboard/top-recipes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/dashboard/top-recipes",
+        "description": "GET dashboard/top-recipes"
+      }
+    },
+    {
+      "name": "GET dashboard/fg-wip",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/dashboard/fg-wip",
+        "description": "GET dashboard/fg-wip"
+      }
+    },
+    {
+      "name": "GET dashboard/kibble",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/dashboard/kibble",
+        "description": "GET dashboard/kibble"
+      }
+    },
+    {
+      "name": "GET records",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/records",
+        "description": "GET records"
+      }
+    },
+    {
+      "name": "GET records/{id}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/records/{{id}}",
+        "description": "GET records/{id}"
+      }
+    },
+    {
+      "name": "PATCH records/{id}",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "{{baseUrl}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/records/{{id}}",
+        "description": "PATCH records/{id}"
+      }
+    },
+    {
+      "name": "DELETE records/{id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "{{baseUrl}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/records/{{id}}",
+        "description": "DELETE records/{id}"
+      }
+    },
+    {
+      "name": "GET recipes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/recipes",
+        "description": "GET recipes"
+      }
+    },
+    {
+      "name": "GET lines",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lines",
+        "description": "GET lines"
+      }
+    },
+    {
+      "name": "GET export",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/export",
+        "description": "GET export"
+      }
+    },
+    {
+      "name": "GET filters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/filters",
+        "description": "GET filters"
+      }
+    },
+    {
+      "name": "GET audit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/audit",
+        "description": "GET audit"
+      }
+    }
+  ]
+}

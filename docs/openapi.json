@@ -1,0 +1,2631 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MaterialIQ API",
+    "version": "1.0.0",
+    "description": "Session auth. All writes require same-origin Origin; all writes except logout require Admin. Weights are exact decimal strings. Inclusive calendar date filters and dimensions are combined. See api-contract.md for response shapes and import semantics."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "recipe_session"
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "operationId": "post_auth_login",
+        "summary": "POST auth/login",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "post_auth_logout",
+        "summary": "POST auth/logout",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "get_auth_me",
+        "summary": "GET auth/me",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/import/preview": {
+      "post": {
+        "operationId": "post_import_preview",
+        "summary": "POST import/preview",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "dataset": {
+                    "type": "string",
+                    "default": "BIN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/import/confirm": {
+      "post": {
+        "operationId": "post_import_confirm",
+        "summary": "POST import/confirm",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "batchId",
+                  "mode"
+                ],
+                "properties": {
+                  "batchId": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "skip",
+                      "replace",
+                      "cancel"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/import/history": {
+      "get": {
+        "operationId": "get_import_history",
+        "summary": "GET import/history",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/import/history/{id}": {
+      "get": {
+        "operationId": "get_import_history_id",
+        "summary": "GET import/history/{id}",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/import/history/{id}/errors": {
+      "get": {
+        "operationId": "get_import_history_id_errors",
+        "summary": "GET import/history/{id}/errors",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/import/history/{id}/rollback": {
+      "post": {
+        "operationId": "post_import_history_id_rollback",
+        "summary": "POST import/history/{id}/rollback",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/dashboard/summary": {
+      "get": {
+        "operationId": "get_dashboard_summary",
+        "summary": "GET dashboard/summary",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/dashboard/daily-usage": {
+      "get": {
+        "operationId": "get_dashboard_daily-usage",
+        "summary": "GET dashboard/daily-usage",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/dashboard/line-distribution": {
+      "get": {
+        "operationId": "get_dashboard_line-distribution",
+        "summary": "GET dashboard/line-distribution",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/dashboard/top-recipes": {
+      "get": {
+        "operationId": "get_dashboard_top-recipes",
+        "summary": "GET dashboard/top-recipes",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/dashboard/fg-wip": {
+      "get": {
+        "operationId": "get_dashboard_fg-wip",
+        "summary": "GET dashboard/fg-wip",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/dashboard/kibble": {
+      "get": {
+        "operationId": "get_dashboard_kibble",
+        "summary": "GET dashboard/kibble",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/records": {
+      "get": {
+        "operationId": "get_records",
+        "summary": "GET records",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/records/{id}": {
+      "get": {
+        "operationId": "get_records_id",
+        "summary": "GET records/{id}",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch_records_id",
+        "summary": "PATCH records/{id}",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "usageDate",
+                  "recordNo",
+                  "productCode",
+                  "recipeCode",
+                  "lineCode",
+                  "sumMassKg",
+                  "eachKg",
+                  "remark",
+                  "kibbleCode"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "usageDate": {
+                    "type": "string"
+                  },
+                  "recordNo": {
+                    "type": "string"
+                  },
+                  "productCode": {
+                    "type": "string"
+                  },
+                  "recipeCode": {
+                    "type": "string"
+                  },
+                  "lineCode": {
+                    "type": "string"
+                  },
+                  "sumMassKg": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "eachKg": {
+                    "type": "string"
+                  },
+                  "remark": {
+                    "type": "string"
+                  },
+                  "kibbleCode": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_records_id",
+        "summary": "DELETE records/{id}",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/recipes": {
+      "get": {
+        "operationId": "get_recipes",
+        "summary": "GET recipes",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/lines": {
+      "get": {
+        "operationId": "get_lines",
+        "summary": "GET lines",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/export": {
+      "get": {
+        "operationId": "get_export",
+        "summary": "GET export",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "xlsx",
+                "csv"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "records",
+                "summary",
+                "recipes",
+                "lines"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/filters": {
+      "get": {
+        "operationId": "get_filters",
+        "summary": "GET filters",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipeCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lineCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kibbleCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    },
+    "/api/audit": {
+      "get": {
+        "operationId": "get_audit",
+        "summary": "GET audit",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Forbidden; Admin required for writes, same-origin Origin required"
+          },
+          "409": {
+            "description": "Duplicate/conflict or unsafe rollback"
+          },
+          "410": {
+            "description": "Expired preview"
+          },
+          "413": {
+            "description": "File, row or export limit exceeded"
+          },
+          "422": {
+            "description": "Workbook validation failed"
+          },
+          "429": {
+            "description": "Login throttled"
+          },
+          "500": {
+            "description": "Safe server error"
+          }
+        }
+      }
+    }
+  }
+}

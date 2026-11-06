@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+enum Role {
+  ADMIN
+  VIEWER
+}
+enum BatchStatus {
+  PREVIEW
+  IMPORTED
+  CANCELLED
+  ROLLED_BACK
+}
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  name String
+  passwordHash String
+  role Role @default(VIEWER)
+  sessionVersion Int @default(0)
+  batches ImportBatch[]
+  audits AuditLog[]
+  createdAt DateTime @default(now())
+}
+model MaterialUsage {
+  id String @id @default(cuid())
+  dataset String @default("BIN")
+  usageDate DateTime @db.Date
+  recordNo String
+  productCode String
+  recipeCode String
+  lineCode String
+  sumMassKg Decimal? @db.Decimal(38, 15)
+  eachKg Decimal @db.Decimal(38, 15)
+  eachTons Decimal @db.Decimal(38, 18)
+  sourceEachTons Decimal? @db.Decimal(38, 18)
+  remark String
+  kibbleCode String
+  importBatchId String
+  importBatch ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Restrict)
+  sourceSheet String
+  sourceRow Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([dataset, usageDate, recordNo])
+  @@index([usageDate])
+  @@index([lineCode])
+  @@index([recipeCode])
+  @@index([productCode])
+  @@index([importBatchId])
+}
+model ImportBatch {
+  id String @id @default(cuid())
+  dataset String @default("BIN")
+  fileName String
+  fileHash String
+  uploadedBy String
+  user User @relation(fields: [uploadedBy], references: [id], onDelete: Restrict)
+  totalRows Int
+  successRows Int @default(0)
+  skippedRows Int @default(0)
+  errorRows Int
+  status BatchStatus @default(PREVIEW)
+  dateFrom DateTime? @db.Date
+  dateTo DateTime? @db.Date
+  uploadedAt DateTime @default(now())
+  expiresAt DateTime
+  previewData Json
+  replacedData Json?
+  committedAt DateTime?
+  records MaterialUsage[]
+  errors ImportError[]
+  @@index([fileHash])
+  @@index([uploadedAt])
+}
+model ImportError {
+  id String @id @default(cuid())
+  importBatchId String
+  importBatch ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  sheetName String
+  rowNumber Int
+  fieldName String
+  errorMessage String
+}
+model AuditLog {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  action String
+  entityType String
+  entityId String
+  beforeData Json?
+  afterData Json?
+  createdAt DateTime @default(now())
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
